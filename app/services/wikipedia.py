@@ -48,7 +48,10 @@ def _parse_event(raw: dict, month: int, day: int) -> WikipediaEvent | None:
             or p.get("title", "").replace("_", " ")
         )
         url = p.get("content_urls", {}).get("desktop", {}).get("page", "")
-        pages.append(WikipediaPage(title=_strip_html(title), url=url))
+        thumbnail = p.get("thumbnail", {}).get("source", "")
+        if not thumbnail:
+            thumbnail = p.get("originalimage", {}).get("source", "")
+        pages.append(WikipediaPage(title=_strip_html(title), url=url, thumbnail_url=thumbnail))
 
     return WikipediaEvent(
         year=int(year),
@@ -64,15 +67,18 @@ def _to_historical_event(event: WikipediaEvent, month: int, day: int) -> Histori
     if event.pages:
         title = event.pages[0].title
         url = event.pages[0].url
+        thumbnail = event.pages[0].thumbnail_url
     else:
         title = event.text[:80] + ("..." if len(event.text) > 80 else "")
         url = ""
+        thumbnail = ""
 
     return HistoricalEvent(
         year=event.year,
         title=title,
         description=event.text,
         wikipedia_url=url,
+        thumbnail_url=thumbnail,
         month=month,
         day=day,
     )

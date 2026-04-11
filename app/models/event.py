@@ -15,6 +15,7 @@ class WikipediaPage(BaseModel):
     """A single Wikipedia article linked to an event."""
     title: str = ""
     url: str = ""
+    thumbnail_url: str = ""
 
 
 class WikipediaEvent(BaseModel):
@@ -34,6 +35,7 @@ class HistoricalEvent(BaseModel):
     title: str
     description: str
     wikipedia_url: str = ""
+    thumbnail_url: str = ""
     # Populated later by the Gemini service.
     ai_summary: str = ""
     month: int = 0

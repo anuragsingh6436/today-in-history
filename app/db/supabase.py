@@ -44,6 +44,7 @@ def _event_to_row(event: HistoricalEvent) -> dict:
         "title": event.title,
         "description": event.description,
         "wikipedia_url": event.wikipedia_url,
+        "thumbnail_url": event.thumbnail_url,
         "ai_summary": event.ai_summary,
     }
 
@@ -57,6 +58,7 @@ def _row_to_event(row: dict) -> HistoricalEvent:
         title=row["title"],
         description=row["description"],
         wikipedia_url=row.get("wikipedia_url", ""),
+        thumbnail_url=row.get("thumbnail_url", ""),
         ai_summary=row.get("ai_summary", ""),
     )
 
