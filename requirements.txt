@@ -1,0 +1,19 @@
+# Core framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic-settings==2.7.1
+
+# HTTP client (Wikipedia API calls)
+httpx==0.28.1
+
+# Database
+supabase==2.11.0
+
+# AI summarization
+google-genai==1.14.0
+
+# Scheduling
+apscheduler==3.11.2
+
+# Env file loading
+python-dotenv==1.0.1
