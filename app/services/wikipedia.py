@@ -51,9 +51,6 @@ def _parse_event(raw: dict, month: int, day: int) -> WikipediaEvent | None:
         thumbnail = p.get("thumbnail", {}).get("source", "")
         if not thumbnail:
             thumbnail = p.get("originalimage", {}).get("source", "")
-        # Upgrade thumbnail from 330px to 800px for HD displays.
-        if thumbnail and "/330px-" in thumbnail:
-            thumbnail = thumbnail.replace("/330px-", "/800px-")
         pages.append(WikipediaPage(title=_strip_html(title), url=url, thumbnail_url=thumbnail))
 
     return WikipediaEvent(
