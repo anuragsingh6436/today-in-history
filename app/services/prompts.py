@@ -37,15 +37,16 @@ class PromptConfig:
 _SHORT_TEMPLATE = """\
 You are a history expert writing for a mobile app.
 
-Write a 2-3 sentence summary of this event. First sentence should \
-spark curiosity, remaining sentences cover what happened and why \
-it still matters. Be vivid but ultra-concise.
+Write a 2-3 sentence summary of this event, then classify it.
 
 RULES:
-- Maximum 50 words.
+- Maximum 50 words for the summary.
 - No headings, no labels, no bullet points, no emojis.
-- Just flowing prose — no "HOOK:" or "WHAT HAPPENED:" prefixes.
+- Just flowing prose.
 - Do NOT start with "On this day" or "In [year]".
+
+Respond in EXACTLY this JSON format (no markdown, no code blocks):
+{{"summary": "your summary here", "category": "one of: War & Conflict, Politics & Government, Science & Technology, Arts & Culture, Sports, Exploration & Discovery, Religion, Disasters, Society", "region": "one of: India, Europe, Americas, Asia, Middle East, Africa, Global"}}
 
 EVENT:
 - Date: {month}/{day}/{year}
@@ -56,25 +57,21 @@ EVENT:
 _DETAILED_TEMPLATE = """\
 You are a world-class history storyteller writing for a "Today in History" app.
 
-Write an engaging 3-paragraph summary of this historical event:
+Write an engaging 3-paragraph summary of this historical event, then classify it.
 
-Paragraph 1: A single punchy sentence that sparks curiosity — make the \
-reader NEED to know more.
-
-Paragraph 2: 2-3 sentences covering what happened, who was involved, \
-and the context.
-
-Paragraph 3: 1-2 sentences on the lasting impact — how this event \
-shaped the world we live in today.
+Paragraph 1: A single punchy sentence that sparks curiosity.
+Paragraph 2: 2-3 sentences covering what happened, who was involved.
+Paragraph 3: 1-2 sentences on the lasting impact.
 
 CRITICAL RULES:
-- Total length: 80-120 words.
-- Tone: vivid, accessible, slightly dramatic — like a great podcast host.
-- Output ONLY the paragraphs — NO headings, NO labels like "HOOK:" or \
-"WHAT HAPPENED:" or "WHY IT MATTERS:". Just clean flowing text.
+- Total length: 80-120 words for the summary.
+- Tone: vivid, accessible, slightly dramatic.
+- NO headings, NO labels like "HOOK:" — just clean flowing text.
 - Separate paragraphs with a blank line.
 - Do NOT start with "On this day" or "In [year]".
-- Use present tense for the first paragraph to create immediacy.
+
+Respond in EXACTLY this JSON format (no markdown, no code blocks):
+{{"summary": "paragraph1\\n\\nparagraph2\\n\\nparagraph3", "category": "one of: War & Conflict, Politics & Government, Science & Technology, Arts & Culture, Sports, Exploration & Discovery, Religion, Disasters, Society", "region": "one of: India, Europe, Americas, Asia, Middle East, Africa, Global"}}
 
 EVENT:
 - Date: {month}/{day}/{year}
@@ -83,28 +80,22 @@ EVENT:
 """
 
 _REEL_TEMPLATE = """\
-You are a viral history content creator writing a script for a \
-60-second social media reel.
+You are a viral history content creator writing a script for a 60-second reel.
 
-Write a script for this historical event in three parts:
+Write a script in three parts, then classify the event.
 
-Part 1: A jaw-dropping one-liner that stops the scroll.
-
-Part 2: Tell the story in short, punchy sentences. Build tension. \
-Use simple words. One idea per sentence.
-
-Part 3: Reveal the surprising aftermath or a little-known fact. \
-End with a line that makes the viewer want to share.
+Part 1: A jaw-dropping one-liner.
+Part 2: Short punchy sentences telling the story.
+Part 3: Surprising aftermath. End with a shareable line.
 
 CRITICAL RULES:
 - Total length: 100-150 words.
-- Output ONLY the script text — NO labels like "HOOK:" or "STORY:" \
-or "TWIST:". Just clean flowing text.
+- NO labels like "HOOK:" or "STORY:" — just clean flowing text.
 - Separate the three parts with blank lines.
-- Write in second person ("you") where possible.
-- Short sentences. Sentence fragments are OK.
 - No emojis, no hashtags.
-- Do NOT start with "Did you know".
+
+Respond in EXACTLY this JSON format (no markdown, no code blocks):
+{{"summary": "part1\\n\\npart2\\n\\npart3", "category": "one of: War & Conflict, Politics & Government, Science & Technology, Arts & Culture, Sports, Exploration & Discovery, Religion, Disasters, Society", "region": "one of: India, Europe, Americas, Asia, Middle East, Africa, Global"}}
 
 EVENT:
 - Date: {month}/{day}/{year}
@@ -133,17 +124,17 @@ STYLES: dict[SummaryStyle, PromptConfig] = {
     SummaryStyle.SHORT: PromptConfig(
         template=_SHORT_TEMPLATE,
         temperature=0.7,
-        max_output_tokens=120,
+        max_output_tokens=200,
     ),
     SummaryStyle.DETAILED: PromptConfig(
         template=_DETAILED_TEMPLATE,
         temperature=0.8,
-        max_output_tokens=300,
+        max_output_tokens=400,
     ),
     SummaryStyle.REEL: PromptConfig(
         template=_REEL_TEMPLATE,
         temperature=0.9,
-        max_output_tokens=400,
+        max_output_tokens=500,
     ),
 }
 

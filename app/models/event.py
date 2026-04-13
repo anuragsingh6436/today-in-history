@@ -38,5 +38,7 @@ class HistoricalEvent(BaseModel):
     thumbnail_url: str = ""
     # Populated later by the Gemini service.
     ai_summary: str = ""
+    category: str = ""
+    region: str = ""
     month: int = 0
     day: int = 0

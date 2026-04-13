@@ -12,7 +12,9 @@ prompt registry in prompts.py.
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+import re
 from typing import List, Optional
 
 from google import genai
@@ -108,22 +110,36 @@ def _fallback_summary(event: HistoricalEvent) -> str:
     )
 
 
+def _parse_gemini_response(raw: str) -> dict:
+    """
+    Parse Gemini's JSON response.
+
+    Handles cases where Gemini wraps JSON in markdown code blocks
+    or returns slightly malformed JSON.
+    """
+    # Strip markdown code blocks if present
+    cleaned = re.sub(r"```json\s*", "", raw)
+    cleaned = re.sub(r"```\s*", "", cleaned)
+    cleaned = cleaned.strip()
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        # If JSON parsing fails, treat the whole thing as a plain summary
+        return {"summary": raw, "category": "", "region": ""}
+
+
 # ── Public API ───────────────────────────────────────────────────
 
 async def summarize_event(
     event: HistoricalEvent,
     settings: Optional[Settings] = None,
     style: Optional[SummaryStyle] = None,
-) -> str:
+) -> HistoricalEvent:
     """
-    Generate an AI summary for a single historical event.
+    Generate an AI summary + category + region for a single event.
 
-    Args:
-        event:    The event to summarize.
-        settings: App settings (defaults to get_settings()).
-        style:    Summary style (defaults to settings.gemini_summary_style).
-
-    Returns a fallback string if the Gemini API is unreachable.
+    Mutates the event in-place and returns it.
     """
     settings = settings or get_settings()
     style = style or SummaryStyle(settings.gemini_summary_style)
@@ -151,9 +167,15 @@ async def summarize_event(
 
     if result is None:
         logger.warning("Falling back to plain summary for '%s'", event.title)
-        return _fallback_summary(event)
+        event.ai_summary = _fallback_summary(event)
+        return event
 
-    return result
+    parsed = _parse_gemini_response(result)
+    event.ai_summary = parsed.get("summary", result)
+    event.category = parsed.get("category", "")
+    event.region = parsed.get("region", "")
+
+    return event
 
 
 async def summarize_events(
@@ -162,15 +184,12 @@ async def summarize_events(
     style: Optional[SummaryStyle] = None,
 ) -> List[HistoricalEvent]:
     """
-    Enrich a list of HistoricalEvent with AI-generated summaries.
-
-    Each event's `ai_summary` field is populated in-place.
-    Events that fail summarization receive a fallback summary.
+    Enrich a list of HistoricalEvent with AI summaries + classification.
     """
     settings = settings or get_settings()
 
     for event in events:
-        event.ai_summary = await summarize_event(event, settings, style=style)
+        await summarize_event(event, settings, style=style)
 
     return events
 
