@@ -35,15 +35,16 @@ class PromptConfig:
 # ── Prompt templates ─────────────────────────────────────────────
 
 _SHORT_TEMPLATE = """\
-You are a history expert writing for a mobile widget.
+You are a history expert writing for a mobile app.
 
-Write a 2-3 sentence summary of this event. First sentence is a \
-curiosity hook, remaining sentences cover what happened and why \
+Write a 2-3 sentence summary of this event. First sentence should \
+spark curiosity, remaining sentences cover what happened and why \
 it still matters. Be vivid but ultra-concise.
 
 RULES:
 - Maximum 50 words.
-- No headings, no bullet points, no emojis.
+- No headings, no labels, no bullet points, no emojis.
+- Just flowing prose — no "HOOK:" or "WHAT HAPPENED:" prefixes.
 - Do NOT start with "On this day" or "In [year]".
 
 EVENT:
@@ -55,20 +56,25 @@ EVENT:
 _DETAILED_TEMPLATE = """\
 You are a world-class history storyteller writing for a "Today in History" app.
 
-Given the following historical event, write an engaging summary in EXACTLY this format:
+Write an engaging 3-paragraph summary of this historical event:
 
-HOOK: A single punchy sentence that sparks curiosity — make the reader NEED to know more.
+Paragraph 1: A single punchy sentence that sparks curiosity — make the \
+reader NEED to know more.
 
-WHAT HAPPENED: 2-3 sentences covering what happened, who was involved, and the context.
+Paragraph 2: 2-3 sentences covering what happened, who was involved, \
+and the context.
 
-WHY IT MATTERS: 1-2 sentences on the lasting impact — how this event shaped the world we live in today.
+Paragraph 3: 1-2 sentences on the lasting impact — how this event \
+shaped the world we live in today.
 
-RULES:
+CRITICAL RULES:
 - Total length: 80-120 words.
 - Tone: vivid, accessible, slightly dramatic — like a great podcast host.
-- No bullet points or markdown — just flowing text under each heading.
+- Output ONLY the paragraphs — NO headings, NO labels like "HOOK:" or \
+"WHAT HAPPENED:" or "WHY IT MATTERS:". Just clean flowing text.
+- Separate paragraphs with a blank line.
 - Do NOT start with "On this day" or "In [year]".
-- Use present tense for the hook to create immediacy.
+- Use present tense for the first paragraph to create immediacy.
 
 EVENT:
 - Date: {month}/{day}/{year}
@@ -78,26 +84,27 @@ EVENT:
 
 _REEL_TEMPLATE = """\
 You are a viral history content creator writing a script for a \
-60-second social media reel / TikTok.
+60-second social media reel.
 
-Write a script for this historical event. Use this structure:
+Write a script for this historical event in three parts:
 
-HOOK (first 3 seconds): A jaw-dropping one-liner that stops the scroll. \
-Use "you" or a bold claim.
+Part 1: A jaw-dropping one-liner that stops the scroll.
 
-STORY (next 40 seconds): Tell the story in short, punchy sentences. \
-Build tension. Use simple words. One idea per sentence.
+Part 2: Tell the story in short, punchy sentences. Build tension. \
+Use simple words. One idea per sentence.
 
-TWIST/PAYOFF (last 15 seconds): Reveal the surprising aftermath or \
-a little-known fact. End with a line that makes the viewer want to \
-share.
+Part 3: Reveal the surprising aftermath or a little-known fact. \
+End with a line that makes the viewer want to share.
 
-RULES:
+CRITICAL RULES:
 - Total length: 100-150 words.
+- Output ONLY the script text — NO labels like "HOOK:" or "STORY:" \
+or "TWIST:". Just clean flowing text.
+- Separate the three parts with blank lines.
 - Write in second person ("you") where possible.
 - Short sentences. Sentence fragments are OK.
 - No emojis, no hashtags.
-- Do NOT start with "Did you know" — be more creative.
+- Do NOT start with "Did you know".
 
 EVENT:
 - Date: {month}/{day}/{year}
@@ -109,14 +116,11 @@ _BATCH_DIGEST_TEMPLATE = """\
 You are a world-class history storyteller writing a daily "Today in History" digest.
 
 Given these historical events from {month}/{day}, pick the 5 most fascinating ones \
-and write a short, engaging digest. For each event:
-
-A one-line curiosity hook.
-One sentence on what happened.
-One sentence on why it matters.
+and write a short, engaging digest. For each event write a brief paragraph with \
+a curiosity hook, what happened, and why it matters.
 
 Keep the total digest under 500 words. Make it feel like a morning newsletter \
-people look forward to reading.
+people look forward to reading. No labels or headings — just flowing prose.
 
 EVENTS:
 {events_text}
@@ -124,7 +128,6 @@ EVENTS:
 
 
 # ── Style registry ───────────────────────────────────────────────
-# Maps SummaryStyle → PromptConfig.  Add new styles here.
 
 STYLES: dict[SummaryStyle, PromptConfig] = {
     SummaryStyle.SHORT: PromptConfig(
@@ -144,7 +147,6 @@ STYLES: dict[SummaryStyle, PromptConfig] = {
     ),
 }
 
-# Batch digest doesn't vary by style — it's always the same format.
 BATCH_DIGEST_PROMPT = _BATCH_DIGEST_TEMPLATE
 
 
